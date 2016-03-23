@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#
+# Run the app/app.rb program with rerun so that is automatically reloads on file
+# changes.
+#
+
+bundle exec rerun 'ruby app/app.rb'
