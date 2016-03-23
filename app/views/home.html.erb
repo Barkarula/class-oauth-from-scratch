@@ -1,5 +1,9 @@
 <ul>
   <li>
-    Login
+    <% if logged_in? %>
+      <a href="/logout">Logout</a>
+    <% else %>
+      <a href="/login">Login</a>
+    <% end %>
   </li>
 </ul>
