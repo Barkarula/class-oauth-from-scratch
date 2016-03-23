@@ -11,7 +11,8 @@ GITHUB_SECRET = "b096810a75a2d80dda981de47a65156aea78172d"
 GITHUB_SCOPE = "user:email,read:org"
 GITHUB_API = {
   authorize: "https://github.com/login/oauth/authorize",
-  token: "https://github.com/login/oauth/access_token"
+  token: "https://github.com/login/oauth/access_token",
+  user: "https://api.github.com/user"
 }
 
 Tilt.register Tilt::ERBTemplate, 'html.erb'
@@ -60,7 +61,12 @@ get "/oauth/github" do
 
     token_response = RestClient.get("#{GITHUB_API[:token]}?#{query_params.to_query}", {accept: "json"})
     token_params = JSON.parse(token_response.body)
-    puts token_params
+
+    query_params = { access_token: token_params['access_token'] }
+    user_response = RestClient.get("#{GITHUB_API[:user]}?#{query_params.to_query}", {accept: "json"})
+    user_params = JSON.parse(user_response.body)
+
+    session[:user_id] = user_params['id']
     session[:logged_in] = true
     [302, {"Location" => "/"}, []]
   end
