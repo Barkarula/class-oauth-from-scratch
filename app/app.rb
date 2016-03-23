@@ -35,7 +35,9 @@ get "/" do
 end
 
 get "/login" do
+  session.clear
   session[:state] = SecureRandom.hex(8)
+  session[:login_referer] = headers['HTTP_REFERER']
 
   query_params = {
     client_id: GITHUB_ID,
@@ -49,7 +51,6 @@ get "/login" do
 end
 
 get "/oauth/github" do
-  puts params.inspect
   if session[:state] != params[:state]
     [403, {}, []]
   else
@@ -68,11 +69,13 @@ get "/oauth/github" do
 
     session[:user_id] = user_params['id']
     session[:logged_in] = true
-    [302, {"Location" => "/"}, []]
+
+    redirect_to = session[:login_referer] || "/"
+    [302, {"Location" => redirect_to}, []]
   end
 end
 
 get "/logout" do
-  session[:logged_in] = false
+  session.clear
   [302, {"Location" => "/"}, []]
 end
